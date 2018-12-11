@@ -147,7 +147,6 @@ export class ProjectsComponent implements OnInit {
       }
     )
   }
-
   //This methos executes when the user clicks the delete project button
   public openConfirmationDialog(id) {
     this.confirmationDialogService.confirm('Please confirm..',

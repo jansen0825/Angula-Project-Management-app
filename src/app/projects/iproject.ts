@@ -1,3 +1,4 @@
+// This is the Project and Projects interfaces
 export interface IProject {
       id: number;
       name: string;

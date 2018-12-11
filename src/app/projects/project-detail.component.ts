@@ -17,6 +17,7 @@ import { ConfirmationDialogService } from '../confirmation-dialog/confirm-dialog
   styleUrls: ['./project-detail.component.css']
 })
 export class ProjectDetailComponent implements OnInit {
+  // Class atributes
   @ViewChild('pdf') myMainFile: ElementRef;
   @ViewChild('photo') myNewPhoto: ElementRef;
   currentUser: IUser;
@@ -41,6 +42,7 @@ export class ProjectDetailComponent implements OnInit {
   users: IUser[];
   sponsors: any[];
 
+  // File Uploads SetUp
   public uploader: FileUploader = new FileUploader({
     url: `http://admin.lvh.me:3000/projects`,
     authTokenHeader: "Authorization",
@@ -53,6 +55,7 @@ export class ProjectDetailComponent implements OnInit {
     }]
     });
 
+    // Class constructor and instance initialization
   constructor(
     private confirmationDialogService: ConfirmationDialogService,
     private formBuilder: FormBuilder,
@@ -65,8 +68,8 @@ export class ProjectDetailComponent implements OnInit {
     });
   }
 
+  // This methos executes at screen initialization
   ngOnInit() {
-
     const param = this.route.snapshot.paramMap.get('id');
     if (param) {
       const id = +param;
@@ -77,6 +80,7 @@ export class ProjectDetailComponent implements OnInit {
          console.log('ImageUpload:uploaded:', item, status, response);
     };
   }
+  // This method gets the specified project
   getProject(id: number) {
   this.projectService.getProject(id).subscribe(
     data => {
@@ -93,6 +97,7 @@ export class ProjectDetailComponent implements OnInit {
   get f() { return this.projectForm.controls; }
   get r() { return this.progressForm.controls; }
 
+  // This method creates the project form
   createProjectForm(project){
     return this.projectForm = this.formBuilder.group({
     id: project.id,
@@ -107,21 +112,25 @@ export class ProjectDetailComponent implements OnInit {
     is_top: project.is_top
     });
   }
+  // This method handles the photo selected event
   onMainPhotoSelected(event){
     this.selectedPhoto = event.target.files[0].name;
     this.projectForm.patchValue({
       main_pic: this.selectedPhoto
     })
   }
+  // This method handles the photo selected event
   onNewPhotoSelected(event){
     this.selectedNewPhoto = event.target.files[0].name;
   }
+  // This method handles the photo selected event
   onBannerSelected(event){
     this.selectedBanner = event.target.files[0].name;
     this.projectForm.patchValue({
       banner_pic: this.selectedBanner
     })
   }
+  // This method handles the PDF selected event
   onPdfSelected(event){
     this.selectedPdf = event.target.files[0].name;
     this.progressForm.patchValue({
@@ -129,6 +138,7 @@ export class ProjectDetailComponent implements OnInit {
     })
   }
 
+  // This method creates the pfogress form
   createProgresstForm(){
     return this.progressForm = this.formBuilder.group({
         id_project: this.project.id,
@@ -136,17 +146,18 @@ export class ProjectDetailComponent implements OnInit {
         pdf_atached: [null, Validators.required]
       });
   }
-
+  // This method executes when canceling a photo
   onCancelNewPhoto(){
     this.myNewPhoto.nativeElement.value = "";
     this.selectedNewPhoto = null;
   }
-
+  // This method executes whene cancelling the pfogress form
   onCancelPdfForm(){
     this.myMainFile.nativeElement.value = "";
     this.progressForm.reset();
   }
 
+  // This method executes whene submitting a form
   onSubmitPhoto(){
     if (this.selectedNewPhoto === null) {
       return;
@@ -171,6 +182,7 @@ export class ProjectDetailComponent implements OnInit {
     );
   }
 
+  // This method executes whene managing members
   onManageMembers(){
     if(this.addMember === true){
       this.addMember = false;
@@ -204,6 +216,7 @@ export class ProjectDetailComponent implements OnInit {
 
   }
 
+  // This method executes whene managing partners
   onManagePartner(){
     if(this.addPartner === true){
       this.addPartner = false;
@@ -231,8 +244,8 @@ export class ProjectDetailComponent implements OnInit {
     );
   }
 
+  // This method executes whene submitting a pdf form
   onSubmitPdf(){
-
     this.pdf_submited = true;
     if (this.progressForm.invalid) {
       return;
@@ -257,6 +270,7 @@ export class ProjectDetailComponent implements OnInit {
     this.myMainFile.nativeElement.value = "";
   }
 
+  // This method executes whene deleting a pdf form
   onDeletePdf(pdf_id, project_id){
     this.projectService.deletePdf(pdf_id, project_id).subscribe(
       (succes) => {
@@ -272,6 +286,7 @@ export class ProjectDetailComponent implements OnInit {
     )
   }
 
+  // This method executes whene confirming a deletion
   public openPDFConfirmationDialog(pdf_id, project_id) {
     this.confirmationDialogService.confirm('Please confirm..', 'Do you really want to DELETE this Update?')
     .then((confirmed) => {
@@ -281,6 +296,7 @@ export class ProjectDetailComponent implements OnInit {
     .catch(() => console.log('User dismissed the dialog (e.g., by using ESC, clicking the cross icon, or clicking outside the dialog)'));
   }
 
+  // This method executes whene deleting a photo
   onDeletePhoto(photo_id, project_id){
     this.projectService.deletePhoto(photo_id, project_id).subscribe(
       (succes) => {
@@ -296,6 +312,7 @@ export class ProjectDetailComponent implements OnInit {
     )
   }
 
+  // This method executes whene confirming a deletion
   public openConfirmationDialog(photo_id, project_id) {
     this.confirmationDialogService.confirm('Please confirm..', 'Do you really want to DELETE this photo?')
     .then((confirmed) => {
@@ -305,8 +322,8 @@ export class ProjectDetailComponent implements OnInit {
     .catch(() => console.log('User dismissed the dialog (e.g., by using ESC, clicking the cross icon, or clicking outside the dialog)'));
   }
 
+  // This method executes whene removing a member
   onMemberClicked(index){
-
     this.users = [ this.project.members[index], ...this.users];
     this.projectService.deleteProjectMember(this.project.members[index].id, this.project.id )
         .subscribe(
@@ -322,8 +339,8 @@ export class ProjectDetailComponent implements OnInit {
     );
   }
 
+  // This method executes whene adding a member
   onUserClicked(index){
-
     this.project.members = [ this.users[index], ...this.project.members];
     let data = {id_project: this.project.id,
     id_member: this.users[index].id}
@@ -341,8 +358,8 @@ export class ProjectDetailComponent implements OnInit {
     );
   }
 
+  // This method executes whene removing a partner
   onPartnerClicked(index){
-
     this.sponsors = [ this.project.partners[index], ...this.sponsors];
     this.projectService.deleteProjectPartner(this.project.partners[index].id, this.project.id )
         .subscribe(
@@ -358,8 +375,8 @@ export class ProjectDetailComponent implements OnInit {
     );
   }
 
+  // This method executes whene adding a sponsor
   onSponsorClicked(index){
-
     this.project.partners = [ this.sponsors[index], ...this.project.partners];
     let data = {id_project: this.project.id,
     id_partner: this.sponsors[index].id}
@@ -377,8 +394,8 @@ export class ProjectDetailComponent implements OnInit {
     );
   }
 
+  // This method executes whene submitting the form
   onSubmit() {
-
     this.submited = true;
     if (this.projectForm.invalid) {
       return;
