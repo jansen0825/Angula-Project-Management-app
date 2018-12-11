@@ -1,0 +1,280 @@
+<div class="page">
+    <div class="page-content">
+      <div class="row">
+        <div class="col-xxl-6 col-xl-6 col-lg-12">
+          <div class="card">
+            <form [formGroup]="projectForm" *ngIf="project">
+            <div class="card-block">
+                <div class="card-text"stile="display: flex;">
+                  <h4 class="card-title project-title">
+
+                  Project Name:  </h4>  <input type="text" class="form-control" id="name" size="35" formControlName="name" [ngClass]="{ 'is-invalid': submitted && f.name.errors }">
+                  <div class="card-text row">
+                    <div *ngIf='currentUser.id_rol === 1' class="mt-5 col "><div><p><strong> Is this a Top Project?</strong></p></div> <label class="switch">
+                        <input type="checkbox" formControlName="is_top">
+                        <span class="slider round"></span>
+                      </label></div>
+                  <div class=" mt-5 col align-self-end text-right"><h5 class="text-right">Tag: </h5></div>
+                  <div class=" mt-5 col align-self-end">
+                  <select name="tag" formControlName="tag" style = "float:right;font-size:1vw" >
+                      <option value="IOT">Internet of Things</option>
+                      <option value="VR">Virtual Reality</option>
+                      <option value="AI">Artificial Inteligence</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card-block ">
+
+              <h4 class="card-title">Project Description:</h4>
+              <textarea class="form-control mb-3" style="display: block;font-size: 16px" placeholder="Description" formControlName="description"  rows="4"
+              [ngClass]="{ 'is-invalid': submitted && f.description.errors }"></textarea>
+                <h4 class="project-option-title">Project Status: </h4>
+                <select name="state" formControlName="state" style = "font-size:1vw">
+                    <option value="ACTIVE">Active</option>
+                    <option value="PAUSED">Paused</option>
+                    <option value="TERMINATED">Terminated</option>
+                </select>
+              <p class="pt-4">
+                URL: <input type="text"  size="30" class="form-control" id="external_url" formControlName="external_url" placeholder="URL">
+              </p>
+              <p>
+                Git:  <input type="text" class="form-control" id="git" formControlName="git" placeholder="Git">
+              </p>
+            </div>
+            <div class="card-block container-fluid">
+              <div class="card-block ">
+                <h4>Main Photo: </h4>
+                <p class="pt-1">Select a new photo to change the projects main picture.</p>
+                <div class="media">
+                <img *ngIf='project && project.main_pic'
+                  src='http://lvh.me:3000/resource/{{project.main_pic}}'
+                  [title]='project.main_pic'
+                  style='max-width:100%'
+                  [style.margin.px]='2'>
+                </div>
+                <input #main type="file" class="pt-2" (change)="onMainPhotoSelected($event)" style="display : block;" ng2FileSelect [uploader]="uploader" />
+
+              </div>
+              <div class="card-block ">
+                  <h4>Banner Picture: </h4>
+                  <p class="pt-1">Select a new photo to change the projects banner.</p>
+                  <div class="media">
+                  <img *ngIf='project && project.banner_pic'
+                    src='http://lvh.me:3000/resource/{{project.banner_pic}}'
+                    [title]='project.banner_pic'
+                    style='max-width:100%'
+                    [style.margin.px]='2'>
+                  </div>
+                  <input #banner type="file"  (change)="onBannerSelected($event)" class="pt-2" style="display : block;" ng2FileSelect [uploader]="uploader" />
+              </div>
+              <div  class="text-center">
+              <button class="mr-5 btn btn-lg btn-white " (click)= "ngOnInit()" href="javascript:void(0)">Reset</button>
+              <button  *ngIf="isMember || currentUser.id_rol === 1" class="ml-5 btn btn-lg btn-primary" (click)= "onSubmit()" type="submit">Update</button>
+              </div>
+            </div>
+          </form>
+          <hr>
+          <div class="row card-block ">
+            <div *ngIf='project && project.progress && project.progress.length' class="card-block project-comments col">
+              <h4>Progress</h4>
+              <ul style="list-style-type:disc">
+                  <li *ngFor='let updt of project.progress' class='pt-4'>
+                    <strong>{{updt.created_in | date:'mediumDate'}}</strong>
+                    <a href='http://lvh.me:3000/resource/{{updt.pdf_atached}}' target="_blanc"><span style="font-size:15px"class="ml-5 badge badge-danger">PDF</span></a>
+                    <button *ngIf="isMember || currentUser.id_rol === 1" type="button" style='float: right; 'class="btn btn-sm btn-icon btn-pure btn-default"
+                          data-toggle="tooltip"  (click)= "openPDFConfirmationDialog(updt.id, updt.id_project )" title="Delete">
+                          <i class="pe-7s-close" style="float: right;font-size:27px;" aria-hidden="true"></i>
+                    </button>
+                    <ul>
+                      <li class='pt-2'>
+                          {{updt.summary}}
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+              </div>
+              <div *ngIf="isMember || currentUser.id_rol === 1" class="col card-block">
+                  <h5 class="pt-4">New Weekly Project Update</h5>
+                  <p style="text-indent: 40px">Provide a small summary of the implementation made to the project,
+                    and upload a full detailed document of the update. File must be uploaded
+                    on PDF format.
+                  </p>
+                  <form [formGroup]="progressForm" *ngIf="project">
+                    <textarea class="form-control mb-sm" placeholder="Summary" formControlName="summary" rows="3" [ngClass]="{ 'is-invalid': pdf_submitted && r.sammary.errors }"></textarea>
+                    <input #pdf type="file" (change)="onPdfSelected($event)" ng2FileSelect [uploader]="uploader"/>
+                    <div class="text-right">
+                        <button class="mr-5 btn btn-sm btn-white" (click)= "onCancelPdfForm()" href="javascript:void(0)">Cancel</button>
+                        <button class="btn btn-primary"(click)= "onSubmitPdf()" type="button">Create</button>
+                    </div>
+                  </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-xxl-6 col-xl-6 col-lg-12">
+          <div class="card">
+            <div class="card-block">
+              <h4 class="project-option-title">Project Photos</h4>
+              <div *ngIf='project && project.images && project.images.length' class="container-fluid gallery-container">
+                  <div class="tz-gallery">
+
+                      <div class="row">
+                          <div *ngFor='let image of project.images; let i = index'  class="col-sm-12 col-md-4 photos">
+                              <img src="http://lvh.me:3000/resource/{{image.name}}" alt="Project Photo {{i}}" class="image">
+                              <div class="middle">
+                                  <div class="lightbox"><a href="http://lvh.me:3000/resource/{{image.name}}" title="Expand" target="_blank"><i class="pe-7s-expand1" style="font-size:27px"></i></a></div>
+                                  <div *ngIf="isMember || currentUser.id_rol === 1" class="lightbox"><button type="button" class="btn btn-icon btn-pure"
+                                    data-toggle="tooltip" (click)= "openConfirmationDialog(image.id)" title="Delete"> <!-- (click)= "onDeletePhoto(image.id)"  --><i class="pe-7s-close-circle" style="font-size:27px"></i></button></div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                </div>
+                <div *ngIf="isMember || currentUser.id_rol === 1" class="card-text">
+                    <h5 class="project-option-title">Add New Photos</h5>
+                    <input #photo type="file" (change)="onNewPhotoSelected($event)" ng2FileSelect [uploader]="uploader"/>
+                    <div class="text-right">
+                        <button class="mr-5 btn btn-sm btn-white" (click)= "onCancelNewPhoto()" href="javascript:void(0)">Cancel</button>
+                        <button class="btn btn-primary"(click)= "onSubmitPhoto()" type="button">Add</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-block">
+              <h4 class="project-option-title ">Members</h4>
+              <div *ngIf="project && project.images" class="media row mt-0">
+                  <div *ngFor="let member of project.members" class="pr-20 mx-auto col-xs-12 ">
+                      <div class="media-body text-center " style="overflow: hidden;">
+                    <a href="javascript:void(0)" class="avatar">
+                      <img src="http://lvh.me:3000/resource/{{member.profile_pic}}">
+                    </a>
+                      </div>
+                    <div class="media-body pt-2">
+                        <h4 class="mt-0 mb-4 font-size-16">{{member.name}} {{member.last}}</h4>
+
+                    </div>
+                  </div>
+              </div>
+              <div *ngIf="isMember || currentUser.id_rol === 1" class="mb-2"><button class="btn btn-primary"(click)= "onManageMembers()" type="button">Add/Remove Members</button></div>
+              <div *ngIf="addMember" class="card-block ">
+                    <h5 class="project-option-title">Manage Members</h5>
+                    <div class="card-text"><p>Click on a User to add him to this project, or click on a Member to remove him from the project.</p></div>
+                    <div class="container row media mt-5 border border-dark ml-auto mr-auto" style="background-color: whitesmoke">
+                      <div class="media-body col mx-auto pb-5">
+                        <div class="pt-3"><p class="project-option-title text-center"><strong> Users</strong></p></div>
+                        <div class="container sombra FixedHeightContainerLeft">
+                        <div *ngFor="let user of users; let i = index" (click)="onUserClicked(i)" class="row border Content border-primary rounded ">
+                          <div class="col text-center Conten">
+                             <a href="javascript:void(0)" class="avatar">
+                                 <img src="http://lvh.me:3000/resource/{{user.profile_pic}}">
+                             </a>
+                          </div>
+                          <div class="col text-center">
+                             <h4 class="pt-3 font-size-16">{{user.name}} {{user.last}}</h4>
+                          </div>
+                        </div>
+                      </div>
+
+                      </div>
+                      <div class="media-body  col mx-auto pb-5">
+                          <div class="pt-3"><p class="project-option-title text-center"><strong>Project Members</strong></p></div>
+                          <div class="container sombra FixedHeightContainerRight">
+                          <div *ngFor="let member of project.members; let i = index" (click)="onMemberClicked(i)" class="row border Content border-primary  rounded">
+                            <div class="col text-center ">
+                               <a href="javascript:void(0)" class="avatar">
+                                   <img src="http://lvh.me:3000/resource/{{member.profile_pic}}">
+                               </a>
+                            </div>
+                            <div class="text-center col">
+                               <h4 class="pt-3 font-size-16">{{member.name}} {{member.last}}</h4>
+                            </div>
+                          </div>
+                        </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+            <div class="card-block project-dates">
+              <h4 class="project-option-title">Dates</h4>
+              <p *ngIf='project && project.created_in' class="mb-10">
+                <span >Created:</span>
+                {{ project.created_in | date:'mediumDate'}}
+              </p>
+            </div>
+          </div>
+
+        <div class="col-xxl-12 mx-0 px-0">
+          <div class="card mx-0 px-0">
+            <!-- Partners Card -->
+            <div class="card-block ">
+              <h4 class="project-option-title">Sponsors</h4>
+              <div *ngIf="isMember || currentUser.id_rol === 1" data-toggle="modal" data-target="#manageProjectPartners"  class="mb-4"><button class="site-action-toggle btn btn-primary"
+                  (click)= "onManagePartner()" data-toggle="modal" aria-hidden="true" type="button">Add/Remove Partners</button></div>
+              <div class="row" *ngIf="project && project.partners">
+              <div *ngFor=" let partner of project.partners; let i = index;" class="col-xs-12 col-sm-6 col-md-3 col-lg-2 ">
+                <div  class="media-body ">
+                  <a href="https://{{partner.url}}" target="_blank" title="{{partner.name}}">
+                    <img src="http://lvh.me:3000/resource/{{partner.logo}}" class="img-fluid"  >
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
+  <!-- MODAL -->
+  <div *ngIf="project && sponsors !== null" class="modal fade" id="myModal" id="manageProjectPartners" aria-hidden="true" aria-labelledby="manageProjectPartners"
+    role="dialog" tabindex="-1">
+      <div class="modal-dialog modal-simple">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" aria-hidden="true" data-dismiss="modal">×</button>
+            <h4 class="modal-title">Manage Project Partners</h4>
+          </div>
+          <div class="modal-body">
+              <div class="card-text pt-4"><p>Click on a sponsor to add it to this project, or click on a partner to remove it from the project.</p></div>
+              <div class="container row media mt-5 border border-dark ml-auto mr-auto" style="background-color: whitesmoke">
+                <div class="media-body col mx-auto pb-5">
+                  <div class="pt-3"><p class="project-option-title text-center"><strong> Sponsors</strong></p></div>
+                  <div class="container sombra FixedHeightContainerLeft">
+                  <div *ngFor="let sponsor of sponsors; let i = index" (click)="onSponsorClicked(i)" class="row border Content border-primary rounded ">
+                    <div class="col text-center Conten">
+                       <a href="javascript:void(0)" class="avatar">
+                           <img src="http://lvh.me:3000/resource/{{sponsor.logo}}">
+                       </a>
+                    </div>
+                  </div>
+                </div>
+
+                </div>
+                <div class="media-body  col mx-auto pb-5">
+                    <div class="pt-3"><p class="project-option-title text-center"><strong>Project Partners</strong></p></div>
+                    <div class="container sombra FixedHeightContainerRight">
+                    <div *ngFor="let partner of project.partners; let i = index" (click)="onPartnerClicked(i)" class="row border Content border-primary  rounded">
+                      <div class="col text-center ">
+                         <a href="javascript:void(0)" class="avatar">
+                             <img src="http://lvh.me:3000/resource/{{partner.logo}}">
+                         </a>
+                      </div>
+                    </div>
+                  </div>
+                  </div>
+                </div>
+              <div class="modal-footer text-right">
+                <button class="btn btn-sm btn-white btn-pure" data-dismiss="modal" href="javascript:void(0)">Close</button>
+              </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+V
+  <!-- End Modal -->

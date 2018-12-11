@@ -1,0 +1,154 @@
+<div class='card'>
+  <div class='card-header'>
+    {{pageTitle}}
+  </div>
+  <div class='card-body'>
+    <div class='row'>
+      <div class='col-md-2'>Filter by:</div>
+      <div class='col-md-4'>
+        <input type='text'
+          [(ngModel)] = 'listFilter'>
+      </div>
+    </div>
+    <div class='row'
+         >
+      <div class='col-md-6'>
+        <h4>Filtered by: {{listFilter}}</h4>
+      </div>
+    </div>
+    <div class='table-responsive'>
+      <table class='table' *ngIf='projects && projects.length'>
+        <thead>
+          <tr>
+            <th>
+              <button class='btn btn-primary' (click)='toggleImage()'>
+                {{showImage ? 'Hide' : 'Show'}} Image
+              </button>
+            </th>
+            <th>Project Name</th>
+            <th>Date Started</th>
+            <th>Tag</th>
+            <th>State</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor='let project of filteredProjects'>
+            <td>  <img *ngIf='showImage'
+              src='http://lvh.me:3000/resource/{{project.main_pic}}'
+              [title]='project.main_pic'
+              [style.width.px]='150'
+              [style.margin.px]='2'>
+            </td>
+            <td><a [routerLink]="['/projects', project.id ]">
+              {{ project.name | uppercase}}
+            </a>
+            </td>
+            <td>{{ project.created_in | date:'fullDate'}}</td>
+            <td><span style="font-size:18px"class="badge badge-warning">{{ project.tag | uppercase }}</span></td>
+            <td>{{ project.state  | uppercase }}</td>
+            <td *ngIf='currentUser.id_rol === 1'>
+              <button type="button" class="btn btn-sm btn-icon btn-pure btn-default"
+                          data-toggle="tooltip"  title="Delete"  (click)= "openConfirmationDialog(project.id)"> <!-- (click)= "onDelete(project.id)"  -->
+                          <i class="pe-7s-close" style="font-size:27px;" aria-hidden="true"></i>
+                </button>
+            </td>
+          </tr>
+
+
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<footer class="footer-padding" style="margin: auto" >
+        <div class="container">
+          <div class="row">
+            <div class="col text-center">
+
+              <img src="../assets/images/SFlogo.png" style="max-width:200px;"
+              class="displayed img-responsive w3-round" alt="SteamForge Logo">
+              <a href="#"><span class="ion-social-twitter social-icons-dark-hover mr15"></span></a>
+                      <a href="#"><span class="ion-social-facebook social-icons-dark-hover mr15"></span></a>
+                      <a href="#"><span class="ion-social-googleplus-outline social-icons-dark-hover"></span></a>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col text-center">
+              <hr>
+              <p class="no-margin">&copy; Jansen Bernard</p>
+            </div><!-- /.column -->
+          </div><!-- /.row -->
+        </div><!-- /.container -->
+  </footer><!-- /.footer -->
+
+
+   <!-- Site Action -->
+   <div class="site-action" data-target="#addProjectForm" data-toggle="modal" data-plugin="actionBtn">
+    <button type="button" data-action="add" title="Add Project" class="site-action-toggle btn-raised btn btn-success btn-floating">
+      <i class="pe-7s-plus pe-spin" style="font-size:35px" aria-hidden="true"></i>
+    </button>
+  </div>
+  <!-- End Site Action -->
+
+
+<div class="modal fade" id="myModal" #projectModal id="addProjectForm" aria-hidden="true" aria-labelledby="addProjectForm"
+  role="dialog" tabindex="-1">
+      <div class="modal-dialog modal-simple">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" aria-hidden="true" data-dismiss="modal">×</button>
+            <h4 class="modal-title">Create New Project</h4>
+          </div>
+          <div class="modal-body">
+            <form [formGroup]="addProjectForm" (ngSubmit)="onSubmit()">
+              <div class="form-group form-material floating">
+                <label class="form-control-label mb-15" for="name">Project name:</label>
+                <input type="text" class="form-control" id="name" formControlName="name" placeholder="Name" [ngClass]="{ 'is-invalid': submitted && f.name.errors }">
+                <div *ngIf="submitted && !! f.name.errors" class="invalid-feedback">
+                  <div *ngIf="!! f.name.errors.required">Name is required</div>
+                </div>
+              </div>
+              <div class="form-group form-material floating">
+                <label class="form-control-label mb-15" for="description">Project description:</label>
+                <textarea class="form-control mb-sm" placeholder="Description" formControlName="description" [ngClass]="{ 'is-invalid': submitted && f.description.errors }" rows="4"></textarea>
+                <div *ngIf="submitted && !! f.description.errors" class="invalid-feedback">
+                  <div *ngIf="!! f.description.errors.required">Description is required</div>
+                </div>
+              </div>
+              <div class="form-group form-material floating">
+                <label class="form-control-label" for="git">Git:</label>
+                <label class="form-control-label r"for="state">State: </label>
+                <select name="state" formControlName="state" style = "float:right;font-size:1vw">
+                  <option value="ACTIVE">Active</option>
+                  <option value="PAUSED">Paused</option>
+                </select>
+                <input type="text" class="form-control" id="git" formControlName="git" placeholder="Git">
+              </div>
+              <div class="form-group form-material floating">
+                <label class="form-control-label" for="url">External URL:</label>
+                <label class="form-control-label t" for="tag">Tag: </label>
+                <select name="tag" formControlName="tag" style = "float:right;font-size:1vw">
+                  <option value="IOT">Internet of Things</option>
+                  <option value="VR">Virtual Reality</option>
+                  <option value="AI">Artificial Inteligence</option>
+                </select>
+                <input type="text" class="form-control" id="external_url" formControlName="external_url" placeholder="URL">
+              </div>
+              <div class="form-group ">
+                <label class="form-control-label" style="width: 300px;"for="main_pic">Project main picture:</label>
+                <input #main type="file" (change)="onPhotoSelected($event)" ng2FileSelect [uploader]="uploader"/>
+              </div>
+              <div class="form-group">
+                <label class="form-control-label" style="width: 300px;"for="name">Project banner:</label>
+                <input #banner type="file" (change)="onBannerSelected($event)" ng2FileSelect [uploader]="uploader"/>
+              </div>
+              <div class="modal-footer text-right">
+                <button class="btn btn-primary"data-dismiss="modal" (click)= "onSubmit()" type="submit">Create</button>
+                <button class="btn btn-sm btn-white btn-pure" data-dismiss="modal" (click)= "onCancel()" href="javascript:void(0)">Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Add Project Form -->

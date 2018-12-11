@@ -1,0 +1,125 @@
+<div class='card'>
+  <div class='card-header'>
+    {{pageTitle}}
+  </div>
+  <div class='card-body'>
+    <div class='row'>
+      <div class='col-md-2'>Filter by:</div>
+      <div class='col-md-4'>
+        <input type='text'
+          [(ngModel)] = 'listFilter'>
+      </div>
+    </div>
+    <div class='row'
+         >
+      <div class='col-md-6'>
+        <h4>Filtered by: {{listFilter}}</h4>
+      </div>
+    </div>
+    <div class='table-responsive'>
+      <table class='table' *ngIf='partners && partners.length'>
+        <thead>
+          <tr>
+            <th>
+              <button class='btn btn-primary' (click)='toggleImage()'>
+                {{showImage ? 'Hide' : 'Show'}} Image
+              </button>
+            </th>
+            <th>Sponsor Name</th>
+            <th>URL</th>
+            <th>Date Started</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor='let partner of filteredPartners'>
+            <td>  <img *ngIf='showImage'
+              src='http://lvh.me:3000/resource/{{partner.logo}}'
+              [title]='partner.logo'
+              [style.width.px]='200'
+              [style.margin.px]='2'>
+            </td>
+            <td><a style="font-size:18px"class="badge" [routerLink]="['/partners', partner.id ]">
+              {{ partner.name | uppercase}}
+            </a>
+            </td>
+            <td><a href="https://{{partner.url}}" target="_blank" >{{ partner.url | uppercase }}</a></td>
+            <td>{{ partner.created_in | date:'fullDate'}}</td>
+            <td>
+              <button type="button" class="btn btn-sm btn-icon btn-pure btn-default"
+                          data-toggle="tooltip" (click)= "openConfirmationDialog(partner.id)" title="Delete"> <!-- (click)= "onDelete(project.id)"  -->
+                          <i class="pe-7s-close" style="font-size:27px;" aria-hidden="true"></i>
+                </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<footer class="footer-padding" style="margin: auto" >
+    <div class="container">
+      <div class="row">
+        <div class="col text-center">
+
+          <img src="../assets/images/SFlogo.png" style="max-width:200px;"
+          class="displayed img-responsive w3-round" alt="SteamForge Logo">
+          <a href="#"><span class="ion-social-twitter social-icons-dark-hover mr15"></span></a>
+                  <a href="#"><span class="ion-social-facebook social-icons-dark-hover mr15"></span></a>
+                  <a href="#"><span class="ion-social-googleplus-outline social-icons-dark-hover"></span></a>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col text-center">
+          <hr>
+          <p class="no-margin">&copy; Jansen Bernard</p>
+        </div><!-- /.column -->
+      </div><!-- /.row -->
+    </div><!-- /.container -->
+</footer><!-- /.footer -->
+
+   <!-- Site Action -->
+   <div class="site-action" data-target="#addPartnerForm" data-toggle="modal" data-plugin="actionBtn">
+      <button type="button" data-action="add" title="Add Partner" class="site-action-toggle btn-raised btn btn-success btn-floating">
+        <i class="pe-7s-plus pe-spin" style="font-size:35px" aria-hidden="true"></i>
+      </button>
+    </div>
+    <!-- End Site Action -->
+
+    <div class="modal fade" id="myModal" #partnerModal id="addPartnerForm" aria-hidden="true" aria-labelledby="addPartnerForm"
+  role="dialog" tabindex="-1">
+      <div class="modal-dialog modal-simple">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" aria-hidden="true" data-dismiss="modal">×</button>
+            <h4 class="modal-title">Create New Partner</h4>
+          </div>
+          <div class="modal-body">
+            <form [formGroup]="addPartnerForm" (ngSubmit)="onSubmit()">
+              <div class="form-group form-material floating">
+                <label class="form-control-label mb-15" for="name">Partner name:</label>
+                <input type="text" class="form-control" id="name" formControlName="name" placeholder="Name" [ngClass]="{ 'is-invalid': submitted && f.name.errors }">
+                <div *ngIf="submitted && !! f.name.errors" class="invalid-feedback">
+                  <div *ngIf="!! f.name.errors.required">Name is required</div>
+                </div>
+              </div>
+              <div class="form-group form-material floating">
+                <label class="form-control-label mb-15" for="description">Partner URL:</label>
+                <input type="text" class="form-control" id="url" formControlName="url" placeholder="URL" [ngClass]="{ 'is-invalid': submitted && f.url.errors }">
+                <div *ngIf="submitted && !! f.url.errors" class="invalid-feedback">
+                  <div *ngIf="!! f.url.errors.required">Description is required</div>
+                </div>
+              </div>
+              <div class="form-group ">
+                <label class="form-control-label" style="width: 300px;"for="logo">Partner logo:</label>
+                <input #logo type="file" (change)="onLogoSelected($event)" ng2FileSelect [uploader]="uploader"/>
+              </div>
+              <div class="modal-footer text-right">
+                <button class="btn btn-primary"data-dismiss="modal" (click)= "onSubmit()" type="submit">Create</button>
+                <button class="btn btn-sm btn-white btn-pure" data-dismiss="modal" (click)= "onCancel()" href="javascript:void(0)">Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Add Project Form -->
