@@ -3,7 +3,6 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, tap, map } from 'rxjs/operators';
 import { IProject, Project } from '../projects/iproject';
-import { IProjectData } from '../projects/iprojectsData';
 import { IUser } from '../users/user.model';
 
 @Injectable({
@@ -31,9 +30,9 @@ export class ApiServiceService {
     );
   }
 
-  getProjects(): Observable<IProjectData> {
-    return this.http.get<IProjectData>(this.projectUrl).pipe(
-      tap(data => console.log('All: ' + JSON.stringify(data))),
+  getProjects(): Observable<IProject[]> {
+    return this.http.get<IProject[]>(this.projectUrl).pipe(
+      tap(projects => console.log('All: ' + JSON.stringify(projects))),
       catchError(this.handleError)
     );
   }

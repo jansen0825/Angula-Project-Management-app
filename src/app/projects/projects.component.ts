@@ -102,8 +102,8 @@ export class ProjectsComponent implements OnInit {
   ngOnInit(): void {
     this.projectService.getProjects().subscribe(
       data => {
-        this.projects = <IProject[]>data.data.projects;
-        console.log(data.data.projects)
+        this.projects = <IProject[]>data;
+        console.log(data)
         this.filteredProjects = this.projects;
       },
       error => this.errorMessage = <any>error
@@ -173,7 +173,7 @@ export class ProjectsComponent implements OnInit {
         .subscribe(
      data => {
       this.addedProject = <any>data.project;
-      console.log(data.project.id)
+      console.log(data)
       this.filteredProjects = [ this.addedProject, ...this.filteredProjects]
       //this.filteredProjects.push(this.addedProject);
       this.addProjectForm.reset();
